@@ -1,0 +1,15 @@
+---
+savestate
+-- saves your previous directory with a reminder message in pure sh
+---
+Usage
+-- add `eval "$(savestate/resume '<NAME>')"` to your shell rc/profile
+---- NAME can be set to __last to use the last savestate
+------ eval is needed for `cd` to work
+---
+Compatibility
+-- tested in oksh, dash, bash & zsh
+---- bash & dash seem to have with eval unless the subshell is properly quoted
+---- this is likely due to $IFS nonsense
+  >> .profile was used for oksh/dash and .bashrc/.zshrc for bash/zsh
+---

@@ -1,0 +1,38 @@
+#!/bin/sh
+# place inside your shell rc/profile
+# provide $1 as the name
+##
+# __last can be used to call to the last saved state
+: "${XDG_CACHE_HOME:=$HOME/.cache}"
+: "${save_loc:=$XDG_CACHE_HOME/savestate_sh/}"
+name="$1"
+[ "$name" = "__last" ] && {
+  . "${save_loc}/__last"
+  # there shouldn't be any use of bashisms in the __last file as it simply provides a name
+}
+if [ -e "$save_loc/${name}0" ]; then
+  count=-1; until [ ! -e "$save_loc/$name" ]; do
+    name="${name%$count}"
+    name="${name%$((count-1))}${count}"
+    : $((count+=1))
+    [ "$count" -eq 9223372036854775806 ] && {
+      printf 'Reached overflow... Please clean files in %s...\n' "$save_loc"
+      exit 1
+    }
+  done
+  name="${name%$count}"
+  : $((count-=1)); name="$name$count"
+  # we want the last existing file; so simply loop till the file is not present then take away 1
+fi
+# if a number has never been added then the above doesn't work
+if [ "$(type source 2>/dev/null)" ]; then
+  source "${save_loc}/$name"
+  # use source to allow for edited states with bashisms and such
+else
+  . "${save_loc}/$name"
+  # using . is the POSIX way
+fi
+printf 'printf "Savestate was %s; You should delete this file when you are done...\\n"\n' "${save_loc}/$name" 
+printf 'printf "Message: %s\\n"\n' "$__savestate_msg"
+printf 'cd "%s"\n' "$__savestate_loc"
+printf 'printf "Saved location was %s; Moved there...\\n"\n' "$__savestate_loc" 

@@ -1,0 +1,52 @@
+#!/bin/sh
+if [ ! "$1" ]; then
+  printf 'Please input the name for this state...\n'
+  printf '> '; read -r name
+else
+  name="$1"
+fi
+[ "$name" = "__last" ] && {
+  printf 'This name is reserved...\n'
+  exit 1
+}
+if [ ! "$2" ]; then
+  printf 'Please input your reminder...\n'
+  printf '> '; read -r msg
+else
+  msg="$2"
+fi
+if [ ! "$3" ]; then
+  printf 'Using PWD (%s) as location...\n' "$PWD"
+  printf 'Provide $3 to set a custom location...\n'
+  loc="$PWD"
+else
+  loc="$3"
+fi
+: "${XDG_CACHE_HOME:=$HOME/.cache}"
+: "${save_loc:=$XDG_CACHE_HOME/savestate_sh/}"
+if [ "$(type mkdir 2>/dev/null)" ]; then
+  mkdir -p "${save_loc}"
+else
+  [ "$quiet" ] || printf 'Please make sure %s exists as mkdir(1) seems to be missing...\n' "$save_loc"
+fi
+[ -e "$save_loc/$name" ] && {
+  [ "$quiet" ] || printf '!! WARNING: %s is already present; adding 1 to suffix until file is not found !!\n' "$save_loc/$name"
+  count=-1; until [ ! -e "$save_loc/$name" ]; do
+    # use -1 such that ${name}0 can be an option
+    name="${name%$count}"
+    name="${name%$((count-1))}${count}"
+    : $((count+=1))
+    [ "$count" -eq 9223372036854775806 ] && {
+      printf 'Reached overflow... Please clean files in %s...\n' "$save_loc"
+      # this prop isn't needed but still, things would go horribly wrong if the count overflowed
+      # additionally if we simply add a char to the end we could eventually reach the file name
+      # length limit, much faster than reaching the number limit in sh
+      exit 1
+    }
+  done
+}
+printf '__savestate_msg="%s"\n' "$msg" > "${save_loc}/$name"
+printf '__savestate_loc="%s"\n' "$loc" >> "${save_loc}/$name"
+printf 'Saved at %s\n' "${save_loc}/$name"
+printf 'name="%s"\n' "$name" > "${save_loc}/__last"
+
