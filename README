@@ -9,7 +9,7 @@ Usage
 ---
 Compatibility
 -- tested in oksh, dash, bash & zsh
----- bash & dash seem to have with eval unless the subshell is properly quoted
+---- bash & dash seem to have issues with eval unless the subshell is properly quoted
 ---- this is likely due to $IFS nonsense
   >> .profile was used for oksh/dash and .bashrc/.zshrc for bash/zsh
 ---
