@@ -25,7 +25,7 @@ if [ -e "$save_loc/${name}0" ]; then
   # we want the last existing file; so simply loop till the file is not present then take away 1
 fi
 # if a number has never been added then the above doesn't work
-if [ "$(type source 2>/dev/null)" ]; then
+if [ "$(command source 2>/dev/null)" ]; then
   source "${save_loc}/$name"
   # use source to allow for edited states with bashisms and such
 else
