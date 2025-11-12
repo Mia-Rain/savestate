@@ -24,7 +24,7 @@ else
 fi
 : "${XDG_CACHE_HOME:=$HOME/.cache}"
 : "${save_loc:=$XDG_CACHE_HOME/savestate_sh/}"
-if [ "$(type mkdir 2>/dev/null)" ]; then
+if [ "$(command mkdir 2>/dev/null)" ]; then
   mkdir -p "${save_loc}"
 else
   [ "$quiet" ] || printf 'Please make sure %s exists as mkdir(1) seems to be missing...\n' "$save_loc"
